@@ -1,0 +1,4 @@
+.idea
+cmake-build-debug
+pg_stringpkey.dSYM/
+pg_stringpkey
