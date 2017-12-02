@@ -4,14 +4,14 @@
 #include <unistd.h>
 #include "postgres.h"
 #include "executor/spi.h"
-#include "fmgr.h"
 #include "library.h"
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC;
 #endif
 
-int main() {
+int
+main() {
 	srand(time(NULL) * getpid());
 	SPI_connect();
 	generate_token(10, 10);
@@ -19,9 +19,9 @@ int main() {
 }
 
 char *
-generate_token(int collision_sensitivity, size_t desired_str_length) {
+generate_token(size_t desired_str_length, int collision_sensitivity) {
 
-	while (--collision_sensitivity) {
+	while (collision_sensitivity--) {
 		char *test = malloc(sizeof(char) * desired_str_length);
 		rand_string(test, desired_str_length);
 		printf("trying -- %s \r\n", test);
