@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <math.h>
 #include "postgres.h"
 #include "executor/spi.h"
 #include "library.h"
@@ -12,41 +13,46 @@ PG_MODULE_MAGIC;
 
 int
 main() {
-	srand(time(NULL) * getpid());
+	srand(time(NULL) + getpid());
 	SPI_connect();
-	generate_token(10, 10);
+	generate_token(10, 30);
 	return 0;
 }
 
 char *
 generate_token(size_t desired_str_length, int collision_sensitivity) {
 
-	while (collision_sensitivity--) {
-		char *test = malloc(sizeof(char) * desired_str_length);
-		rand_string(test, desired_str_length);
-		printf("trying -- %s \r\n", test);
+	if (likelihood_of_collision(12, 12)) {
+		char *test_key = palloc0(sizeof(char) * desired_str_length);
+		gen_rand_string(test_key, desired_str_length);
+		printf("trying -- %s \r\n", test_key);
 		ret = SPI_exec(command, cnt);
 	}
 
 	return "123123123";
 }
 
-//bool collision_detected(char *str) {
-
-//}
-
 // https://codereview.stackexchange.com/questions/29198/random-string-generator-in-c
 // should be further optimized
 static char *
-rand_string(char *str, size_t size) {
-	const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJK0123456789";
+gen_rand_string(char *str, size_t size) {
 	if (size) {
 		--size;
 		for (size_t n = 0; n < size; n++) {
-			int key = rand() % (int) (sizeof charset - 1);
+			long key = random() % (int) (sizeof charset - 1);
 			str[n] = charset[key];
 		}
 		str[size] = '\0';
 	}
 	return str;
+}
+
+double
+likelihood_of_collision(size_t key_length_count, int record_count) {
+	return (record_count / pow(sizeof(charset), key_length_count)) * 100;
+}
+
+size_t
+det_max_key_length() {
+	ret = SPI_exec(command, cnt);
 }
